@@ -1,28 +1,34 @@
-'use strict'
+'use strict';
 
-const Model = use('Model')
+const Model = use('Model');
 
 class Post extends Model {
-  user () {
-    return this.belongsTo('App/Models/User')
+  static boot() {
+    super.boot();
+
+    this.addHook('afterCreate', 'PostHook.sendWs');
   }
 
-  likes () {
-    return this.hasMany('App/Models/LikePost')
+  user() {
+    return this.belongsTo('App/Models/User');
   }
 
-  comments () {
-    return this.hasMany('App/Models/Comment')
+  likes() {
+    return this.hasMany('App/Models/LikePost');
   }
 
-  static scopeWithLikes (query) {
-    return query.select('*', function () {
+  comments() {
+    return this.hasMany('App/Models/Comment');
+  }
+
+  static scopeWithLikes(query) {
+    return query.select('*', function() {
       return this.count('*')
         .from('like_posts')
         .whereRaw('post_id = posts.id')
-        .as('likes')
-    })
+        .as('likes');
+    });
   }
 }
 
-module.exports = Post
+module.exports = Post;
